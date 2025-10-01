@@ -8,27 +8,48 @@ on:
     branches:
         - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14.19
+        env:
+          POSTGRES_USER: ${POSTGRES_USER:-estacionaadmin}
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-teste123}
+          POSTGRES_DB: ${POSTGRES_DB:-estacionarapido}
+          POSTGRES_HOST_AUTH_METHOD: md5
+          POSTGRES_INITDB_ARGS: --auth=md5
+        volumes:
+          - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '21'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U estacionaadmin; do
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
       - name: Build with Maven
         run: mvn test
