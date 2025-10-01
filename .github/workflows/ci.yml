@@ -23,7 +23,7 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: md5
           POSTGRES_INITDB_ARGS: --auth=md5
         volumes:
-          - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+          - ./backend/src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -52,4 +52,4 @@ jobs:
             sleep 2
           done
       - name: Build with Maven
-        run: mvn test
+        run: mvn test -f backend/pom.xml
