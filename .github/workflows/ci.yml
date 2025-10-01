@@ -17,9 +17,9 @@ jobs:
       postgres:
         image: postgres:14.19
         env:
-          POSTGRES_USER: ${POSTGRES_USER:-estacionaadmin}
-          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-teste123}
-          POSTGRES_DB: ${POSTGRES_DB:-estacionarapido}
+          POSTGRES_USER: estacionaadmin
+          POSTGRES_PASSWORD: teste123
+          POSTGRES_DB: estacionarapido
           POSTGRES_HOST_AUTH_METHOD: md5
           POSTGRES_INITDB_ARGS: --auth=md5
         volumes:
