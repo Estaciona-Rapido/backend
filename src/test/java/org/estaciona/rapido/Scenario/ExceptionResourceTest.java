@@ -1,6 +1,7 @@
 package org.estaciona.rapido.Scenario;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusIntegrationTest;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -9,8 +10,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 
-@QuarkusTest
-class ExceptionResourceTest {
+@QuarkusIntegrationTest
+class ExceptionResourceIT {
     @Test
     void testExceptionEndpoint() {
         //POST method:
