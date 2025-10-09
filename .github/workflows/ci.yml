@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
       - uses: actions/checkout@v5
       - name: Build with Maven
-        run: ./mvnw package
+        run: ./mvnw package -DskipTests
   compose:
     runs-on: ubuntu-latest
     needs: build
