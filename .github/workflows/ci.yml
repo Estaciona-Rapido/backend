@@ -9,7 +9,7 @@ on:
         - main
 
 env:
-  QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://estaciona-postgres:5432/estacionarapido
+  QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://localhost:5433/estacionarapido
 
 jobs:
   build:
