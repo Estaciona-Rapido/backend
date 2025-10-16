@@ -1,5 +1,6 @@
 package org.estaciona.rapido.Scenario;
 
+// TODO: delete, it is without use.
 public class Scenario {
     public String name;
     public long capacity;

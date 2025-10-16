@@ -15,19 +15,37 @@ public class ScenarioService {
     EntityManager em;
 
     @Transactional
-    public void newScenario(Scenario scenario) {
+    public void newScenario(String name) {
         ScenarioEntity sc = new ScenarioEntity();
-        sc.name = scenario.name;
-        sc.capacity = scenario.capacity;
-        sc.period = scenario.periodString;
+        sc.name = name;
+        // TODO: add exception for not having default.
+        ScenarioEntity defaultScenarioEntity = em.getReference(ScenarioEntity.class, 1);
+        sc.capacity = defaultScenarioEntity.capacity;
+        // TODO: inserts period of today or tomorrow in the correct format.
+        sc.period = defaultScenarioEntity.period;
+        // TODO: add the same price model and bussiness hour from default.
         em.persist(sc);
+        
     }
 
     @Transactional
-    public List<ScenarioEntity> listExceptionalScenarios() {
-        List<ScenarioEntity> ls = em.createQuery("SELECT s FROM ScenarioEntity s", ScenarioEntity.class)
-                 .setMaxResults(10)
-                 .getResultList();
+    public List<ScenarioBriefDTO> listExceptionalScenarios() {
+        List<ScenarioBriefDTO> ls = em.createQuery("SELECT new org.estaciona.rapido.Scenario.ScenarioBriefDTO(s.id, s.name) FROM ScenarioEntity s", ScenarioBriefDTO.class)
+                .getResultList();
         return ls.subList(1, ls.size());
+    }
+
+    @Transactional
+    public boolean deleteExceptionalScenario(long id)
+    {
+        if (id <= 1) {
+            return false;
+        }
+        ScenarioEntity toDeleteScenarioEntity = em.getReference(ScenarioEntity.class, id);
+        if (toDeleteScenarioEntity == null) {
+            return false;
+        }
+        em.remove(toDeleteScenarioEntity);
+        return true;
     }
 }

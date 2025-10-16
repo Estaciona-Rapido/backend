@@ -10,6 +10,9 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name="scenario")
 public class ScenarioEntity {
+
+    public ScenarioEntity() {};
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_scenario")
