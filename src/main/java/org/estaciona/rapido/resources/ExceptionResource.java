@@ -1,7 +1,9 @@
-package org.estaciona.rapido.Scenario;
+package org.estaciona.rapido.resources;
 
 import java.util.List;
 
+import org.estaciona.rapido.dpo.ScenarioBrief;
+import org.estaciona.rapido.services.ScenarioService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -34,15 +36,10 @@ public class ExceptionResource {
 
     @GET
     @Transactional
-    public List<ScenarioBriefDTO> listExceptionalScenarios()
+    public List<ScenarioBrief> listExceptionalScenarios()
     {
         return service.listExceptionalScenarios();
     }
-
-    // @GET
-    // @Path("{id}")
-    // @Transactional
-    // public ScenarioEntity 
 
     @DELETE
     @Path("{id}")

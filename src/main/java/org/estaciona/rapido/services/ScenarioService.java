@@ -1,12 +1,14 @@
-package org.estaciona.rapido.Scenario;
+package org.estaciona.rapido.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.DELETE;
 
 import java.util.List;
+
+import org.estaciona.rapido.dpo.ScenarioBrief;
+import org.estaciona.rapido.persistence.ScenarioEntity;
 
 @ApplicationScoped
 public class ScenarioService {
@@ -23,14 +25,14 @@ public class ScenarioService {
         sc.capacity = defaultScenarioEntity.capacity;
         // TODO: inserts period of today or tomorrow in the correct format.
         sc.period = defaultScenarioEntity.period;
-        // TODO: add the same price model and bussiness hour from default.
+        // TODO: add the same price model and business hour from default.
         em.persist(sc);
         
     }
 
     @Transactional
-    public List<ScenarioBriefDTO> listExceptionalScenarios() {
-        List<ScenarioBriefDTO> ls = em.createQuery("SELECT new org.estaciona.rapido.Scenario.ScenarioBriefDTO(s.id, s.name) FROM ScenarioEntity s", ScenarioBriefDTO.class)
+    public List<ScenarioBrief> listExceptionalScenarios() {
+        List<ScenarioBrief> ls = em.createQuery("SELECT new org.estaciona.rapido.Scenario.ScenarioBriefDTO(s.id, s.name) FROM ScenarioEntity s", ScenarioBrief.class)
                 .getResultList();
         return ls.subList(1, ls.size());
     }

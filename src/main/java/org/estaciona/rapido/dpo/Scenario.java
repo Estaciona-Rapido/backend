@@ -1,4 +1,4 @@
-package org.estaciona.rapido.Scenario;
+package org.estaciona.rapido.dpo;
 
 // TODO: delete, it is without use.
 public class Scenario {
