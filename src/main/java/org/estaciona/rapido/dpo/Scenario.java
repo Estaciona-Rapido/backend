@@ -1,17 +1,12 @@
 package org.estaciona.rapido.dpo;
 
-// TODO: delete, it is without use.
+import java.util.List;
+
 public class Scenario {
+    public long id;
     public String name;
     public long capacity;
-    public String periodString;
+    public List<PriceOption> prices;
 
     public Scenario(){}
-    public Scenario(String name, long capacity, String periodString)
-    {
-        this.name = name;
-        this.capacity = capacity;
-        this.periodString = periodString;
-    }
-
 }

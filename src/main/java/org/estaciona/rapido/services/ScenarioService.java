@@ -24,25 +24,11 @@ public class ScenarioService {
         // TODO: add exception for not having default.
         ScenarioEntity defaultScenarioEntity = em.getReference(ScenarioEntity.class, 1);
         sc.capacity = defaultScenarioEntity.capacity;
-        // TODO: inserts period of today or tomorrow in the correct format.
-        sc.period = defaultScenarioEntity.period;
+        sc.start = OffsetDateTime.now();
+        sc.end = OffsetDateTime.now().plusDays(1);
         // TODO: add the same price model and business hour from default.
         em.persist(sc);
         
-    }
-
-    @Transactional
-    public ScenarioEntity getCurrentScenario() throws Exception
-    {
-        OffsetDateTime rightNow = OffsetDateTime.now();
-        List<ScenarioEntity> currentScenarios = em.createNamedQuery("ScenarioEntities.getCurrentScenarios", ScenarioEntity.class).setParameter("tmsZ", rightNow).getResultList();
-        if (currentScenarios.size() > 1) {
-            return currentScenarios.get(1); // TODO: maybe the tiebreaker criteria will change later.
-        } else if (currentScenarios.size() == 1) {
-            return currentScenarios.get(0);
-        } else {
-            throw new Exception("There is no scenarios in the current scenario. Please, check the state and position of default scenario in the database.");
-        }
     }
 
     @Transactional

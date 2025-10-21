@@ -14,6 +14,8 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+//TODO: include price model frequency.
+
 @Entity
 @Table(name = "price_model")
 public class PriceModelEntity {
