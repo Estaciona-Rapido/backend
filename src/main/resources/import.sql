@@ -1,1 +1,1 @@
-INSERT INTO scenario(scenario_name, capacity, period) VALUES ('dia-a-dia', 30, '[,]');
+INSERT INTO scenario(scenario_name, capacity, scenario_start, scenario_end) VALUES ('dia-a-dia', 30, '1970-01-01 00:00:00-03', '9999-12-31 23:59:59-03');

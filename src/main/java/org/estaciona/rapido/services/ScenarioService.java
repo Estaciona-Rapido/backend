@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.estaciona.rapido.dpo.ScenarioBrief;
@@ -28,6 +29,20 @@ public class ScenarioService {
         // TODO: add the same price model and business hour from default.
         em.persist(sc);
         
+    }
+
+    @Transactional
+    public ScenarioEntity getCurrentScenario() throws Exception
+    {
+        OffsetDateTime rightNow = OffsetDateTime.now();
+        List<ScenarioEntity> currentScenarios = em.createNamedQuery("ScenarioEntities.getCurrentScenarios", ScenarioEntity.class).setParameter("tmsZ", rightNow).getResultList();
+        if (currentScenarios.size() > 1) {
+            return currentScenarios.get(1); // TODO: maybe the tiebreaker criteria will change later.
+        } else if (currentScenarios.size() == 1) {
+            return currentScenarios.get(0);
+        } else {
+            throw new Exception("There is no scenarios in the current scenario. Please, check the state and position of default scenario in the database.");
+        }
     }
 
     @Transactional

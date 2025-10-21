@@ -20,8 +20,5 @@ import jakarta.transaction.Transactional;
 public class BusinessHourResource {
     @Inject
     BusinessHourService service;
-
-    @GET
-    
         
 }
