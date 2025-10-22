@@ -17,9 +17,9 @@ class ExceptionResourceIT {
         //POST method:
         given()
             .when()
-            .body("{\"name\":\"Ano Novo 2026\",\"capacity\": 1, \"periodString\": \"[2025-12-31 00:00, 2026-01-02 00:00)\"}")
+            //.body("{\"name\":\"Ano Novo 2026\",\"capacity\": 1, \"periodString\": \"[2025-12-31 00:00, 2026-01-02 00:00)\"}")
             .contentType("application/json")
-            .post("/exception")
+            .post("/exception?name=feriado")
             .then()
             
             .statusCode(204);
