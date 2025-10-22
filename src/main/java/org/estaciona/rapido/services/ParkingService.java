@@ -11,9 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.estaciona.rapido.dpo.PriceOption;
-import org.estaciona.rapido.dpo.Scenario;
-import org.estaciona.rapido.dpo.Parking.ParkingRegisterProposal;
+import org.estaciona.rapido.dto.PriceOption;
+import org.estaciona.rapido.dto.Scenario;
+import org.estaciona.rapido.dto.Parking.ParkingRegisterProposal;
+import org.estaciona.rapido.exceptions.ClosedException;
+import org.estaciona.rapido.exceptions.NoScenariosException;
+import org.estaciona.rapido.persistence.BusinessHourEntity;
 import org.estaciona.rapido.persistence.OperationEntity;
 import org.estaciona.rapido.persistence.PriceModelEntity;
 import org.estaciona.rapido.persistence.ScenarioEntity;
@@ -23,7 +26,7 @@ public class ParkingService {
     @Inject
     EntityManager em;
 
-    private ScenarioEntity getCurrentScenarioEntity() throws Exception
+    private ScenarioEntity getCurrentScenarioEntity() throws NoScenariosException
     {
         OffsetDateTime rightNow = OffsetDateTime.now();
         List<ScenarioEntity> currentScenarios = em.createNamedQuery("ScenarioEntities.getCurrentScenarios", ScenarioEntity.class).setParameter("tmsZ", rightNow).getResultList();
@@ -32,15 +35,25 @@ public class ParkingService {
         } else if (currentScenarios.size() == 1) {
             return currentScenarios.get(0);
         } else {
-            throw new Exception("There is no scenarios in the current date and time. Please, check the state and position of default scenario in the database.");
+            throw new NoScenariosException();
         }
     }
 
+    private boolean isAvaliable(ScenarioEntity sc)
+    {
+        OffsetDateTime today = OffsetDateTime.now();
+        return em.createNamedQuery("BusinessHourEntities.getAvaliable", BusinessHourEntity.class)
+            .setParameter("id", sc.id)
+            .setParameter("weekDay", today.getDayOfWeek().getValue())
+            .setParameter("time", today.toLocalTime())    
+        .getResultList().size() != 0;
+    }
     @Transactional
-    public Scenario getCurrentScenario() throws Exception
+    public Scenario getCurrentScenario() throws NoScenariosException
     {
         ScenarioEntity origin = getCurrentScenarioEntity();
         Scenario result = new Scenario();
+        result.open = isAvaliable(origin);
         result.id = origin.id;
         result.name = origin.name;
         result.capacity = origin.capacity;
@@ -51,6 +64,8 @@ public class ParkingService {
                 iPriceOption.id = priceModel.id;
                 iPriceOption.name = priceModel.name;
                 iPriceOption.value = priceModel.value;
+                iPriceOption.frequencyValue = priceModel.frequencyValue;
+                iPriceOption.frequencyType = priceModel.frequencyType.toString();
                 result.prices.add(iPriceOption);
             }
         }
@@ -59,15 +74,19 @@ public class ParkingService {
     }
 
     @Transactional
-    public void register(ParkingRegisterProposal proposal) throws IndexOutOfBoundsException
+    public void register(ParkingRegisterProposal proposal) throws IndexOutOfBoundsException, NoScenariosException, ClosedException
     {
-        OperationEntity parking_operation = new OperationEntity();
-        parking_operation.plate = proposal.getPlate();
-        parking_operation.entry = OffsetDateTime.now();
-        parking_operation.price_model = em.find(PriceModelEntity.class, proposal.price_model_id);
-        if (parking_operation.price_model == null) {
+        ScenarioEntity currentScenario = getCurrentScenarioEntity();
+        if (!isAvaliable(currentScenario)) {
+            throw new ClosedException();
+        }
+        else if (!currentScenario.prices.stream().anyMatch(price -> (price.id == proposal.price_model_id) && (price.isActivated))) {
             throw new IndexOutOfBoundsException(proposal.price_model_id);
         } else {
+            OperationEntity parking_operation = new OperationEntity();
+            parking_operation.plate = proposal.getPlate();
+            parking_operation.entry = OffsetDateTime.now();
+            parking_operation.price_model = em.find(PriceModelEntity.class, proposal.price_model_id);
             em.persist(parking_operation);
         }
     }

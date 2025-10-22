@@ -1,4 +1,4 @@
-package org.estaciona.rapido.dpo;
+package org.estaciona.rapido.dto;
 
 public class ScenarioBrief {
     public long id;

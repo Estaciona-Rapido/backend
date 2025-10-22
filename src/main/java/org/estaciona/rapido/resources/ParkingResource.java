@@ -1,11 +1,14 @@
 package org.estaciona.rapido.resources;
 
-import org.estaciona.rapido.dpo.Scenario;
-import org.estaciona.rapido.dpo.Parking.ParkingRegisterProposal;
+import org.estaciona.rapido.dto.Scenario;
+import org.estaciona.rapido.dto.Parking.ParkingRegisterProposal;
+import org.estaciona.rapido.exceptions.ClosedException;
+import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.services.ParkingService;
 
 import org.jboss.resteasy.reactive.RestQuery;
 
+import io.quarkus.security.ForbiddenException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -34,8 +37,8 @@ public class ParkingResource {
     public Scenario getCurrentScenario() {
         try {
             return service.getCurrentScenario();
-        } catch (Exception e) {
-            throw new InternalServerErrorException("There is no scenarios in the current date and time. Please, check the state and position of default scenario in the database.");
+        } catch (NoScenariosException e) {
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 
@@ -46,8 +49,12 @@ public class ParkingResource {
     {
         try {
             service.register(proposal);
+        } catch (ClosedException ce) {
+            throw new ForbiddenException(ce.getMessage());
         } catch (IndexOutOfBoundsException e) {
             throw new NotFoundException("Price model of id "+ proposal.price_model_id + " does not exist.");
+        } catch (NoScenariosException nsce) {
+            throw new InternalServerErrorException(nsce.getMessage());
         }
         return Response.status(Response.Status.CREATED).build();
         

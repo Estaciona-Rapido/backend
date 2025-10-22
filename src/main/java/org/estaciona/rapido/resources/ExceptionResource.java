@@ -2,7 +2,7 @@ package org.estaciona.rapido.resources;
 
 import java.util.List;
 
-import org.estaciona.rapido.dpo.ScenarioBrief;
+import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.services.ScenarioService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;

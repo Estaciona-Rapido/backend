@@ -8,7 +8,7 @@ import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.estaciona.rapido.dpo.ScenarioBrief;
+import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.persistence.ScenarioEntity;
 
 @ApplicationScoped
@@ -33,7 +33,7 @@ public class ScenarioService {
 
     @Transactional
     public List<ScenarioBrief> listExceptionalScenarios() {
-        List<ScenarioBrief> ls = em.createQuery("SELECT new org.estaciona.rapido.Scenario.ScenarioBriefDTO(s.id, s.name) FROM ScenarioEntity s", ScenarioBrief.class)
+        List<ScenarioBrief> ls = em.createQuery("SELECT new org.estaciona.rapido.dto.ScenarioBrief(s.id, s.name) FROM ScenarioEntity s", ScenarioBrief.class)
                 .getResultList();
         return ls.subList(1, ls.size());
     }

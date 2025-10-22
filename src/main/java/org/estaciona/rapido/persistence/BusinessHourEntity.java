@@ -9,10 +9,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name="business_hour")
+@NamedQuery(name = "BusinessHourEntities.getAvaliable",
+    query = "SELECT b FROM BusinessHourEntity b WHERE b.scenario.id = :id AND :weekDay BETWEEN b.startWeekDay AND b.endWeekDay AND :time BETWEEN b.startTime AND b.endTime AND b.isActivated is True")
 public class BusinessHourEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +23,7 @@ public class BusinessHourEntity {
     public long id;
 
     @Column(name = "activated",nullable = false)
-    public boolean activated;
+    public boolean isActivated = true;
 
     @Column(name="start_week_day", nullable = false)
     public short startWeekDay;

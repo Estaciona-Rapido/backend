@@ -34,7 +34,7 @@ public class ScenarioEntity {
 
     /**In minutes*/
     @Column(name = "tolerance", nullable = false)
-    public int tolerance;
+    public int tolerance = 15;
 
     @Column(name = "scenario_start", nullable = false)
     public OffsetDateTime start;

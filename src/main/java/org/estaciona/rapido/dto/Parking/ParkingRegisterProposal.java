@@ -1,4 +1,4 @@
-package org.estaciona.rapido.dpo.Parking;
+package org.estaciona.rapido.dto.Parking;
 
 import java.io.IOException;
 import java.util.regex.Matcher;

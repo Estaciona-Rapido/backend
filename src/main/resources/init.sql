@@ -22,6 +22,8 @@ CREATE TABLE price_model(
     model_name VARCHAR(50) NOT NULL,
     activated BOOLEAN NOT NULL DEFAULT TRUE,
     price NUMERIC(38,2) NOT NULL CHECK (price > 0),
+    frequency_value INT NOT NULL DEFAULT 1 CHECK(frequency_value > 0),
+    frequency_type VARCHAR(50) NOT NULL DEFAULT 'HOUR',
     id_scenario BIGINT NOT NULL REFERENCES scenario (id_scenario)
 );
 
