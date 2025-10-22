@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.estaciona.rapido.dto.ParkingRecord;
+import org.estaciona.rapido.dto.ParkingRegisterProposal;
 import org.estaciona.rapido.dto.PriceOption;
 import org.estaciona.rapido.dto.Scenario;
-import org.estaciona.rapido.dto.Parking.ParkingRegisterProposal;
+import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.persistence.BusinessHourEntity;
@@ -89,5 +91,11 @@ public class ParkingService {
             parking_operation.price_model = em.find(PriceModelEntity.class, proposal.price_model_id);
             em.persist(parking_operation);
         }
+    }
+
+    public List<ParkingRecord> getParkingHistory()
+    {
+        return em.createQuery("SELECT new org.estaciona.rapido.dto.ParkingRecord(o.id, o.plate, o.entry, o.leave, o.total) FROM OperationEntity o", ParkingRecord.class)
+                .getResultList();
     }
 }

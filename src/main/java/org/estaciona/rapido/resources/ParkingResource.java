@@ -1,7 +1,10 @@
 package org.estaciona.rapido.resources;
 
+import java.util.List;
+
+import org.estaciona.rapido.dto.ParkingRecord;
+import org.estaciona.rapido.dto.ParkingRegisterProposal;
 import org.estaciona.rapido.dto.Scenario;
-import org.estaciona.rapido.dto.Parking.ParkingRegisterProposal;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.services.ParkingService;
@@ -58,5 +61,12 @@ public class ParkingResource {
         }
         return Response.status(Response.Status.CREATED).build();
         
+    }
+
+    @GET
+    @Path("history")
+    public List<ParkingRecord> getParkingHistory()
+    {
+        return service.getParkingHistory();
     }
 }
