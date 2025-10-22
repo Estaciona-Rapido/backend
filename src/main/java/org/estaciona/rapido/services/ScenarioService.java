@@ -24,8 +24,8 @@ public class ScenarioService {
         // TODO: add exception for not having default.
         ScenarioEntity defaultScenarioEntity = em.getReference(ScenarioEntity.class, 1);
         sc.capacity = defaultScenarioEntity.capacity;
-        sc.start = OffsetDateTime.now();
-        sc.end = OffsetDateTime.now().plusDays(1);
+        sc.start = OffsetDateTime.now().plusDays(1);
+        sc.end = OffsetDateTime.now().plusDays(2);
         // TODO: add the same price model and business hour from default.
         em.persist(sc);
         
