@@ -16,7 +16,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "operation")
 @NamedQuery(name = "OperationEntity.getOccupancy",
-    query = "SELECT COUNT(op.id) FROM OperationEntity op WHERE op.leave is NULL AND op.total is NULL")
+    query = "SELECT COUNT(operation.id) FROM OperationEntity operation WHERE operation.leave is NULL AND operation.hasPaid is FALSE")
+@NamedQuery(name = "OperationEntities.filterParkedByPlate",
+    query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate AND operation.hasPaid is FALSE")
+@NamedQuery(name = "OperationEntities.getParkedByPlate",
+    query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate AND operation.hasPaid is FALSE")
 public class OperationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +38,9 @@ public class OperationEntity {
 
     @Column(name = "total", nullable = true, precision = 38, scale = 2)
     public BigDecimal total;
+
+    @Column(name = "paid", nullable = false)
+    public boolean hasPaid = false;
 
     @ManyToOne
     @JoinColumn(name = "id_price_model", nullable = false)

@@ -3,10 +3,17 @@ package org.estaciona.rapido.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.transaction.Transactional;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,6 +26,7 @@ import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.persistence.BusinessHourEntity;
+import org.estaciona.rapido.persistence.FrequencyEnum;
 import org.estaciona.rapido.persistence.OperationEntity;
 import org.estaciona.rapido.persistence.PriceModelEntity;
 import org.estaciona.rapido.persistence.ScenarioEntity;
@@ -88,14 +96,50 @@ public class ParkingService {
             OperationEntity parking_operation = new OperationEntity();
             parking_operation.plate = proposal.getPlate();
             parking_operation.entry = OffsetDateTime.now();
+            parking_operation.hasPaid = false;
             parking_operation.price_model = em.find(PriceModelEntity.class, proposal.price_model_id);
             em.persist(parking_operation);
         }
     }
 
+    private long calculatePeriodInMinutes(int value, FrequencyEnum type)
+    {
+        return ((long) value) * ((long) type.getValueInMinutes());
+    }
+
+    public BigDecimal getTotal(String plate, OffsetDateTime leaveOffsetDateTime)
+    {
+        OperationEntity plateRecord = em.createNamedQuery("OperationEntities.filterParkedByPlate", OperationEntity.class)
+        .setParameter("plate", plate)
+        .getResultList().get(0);
+        BigDecimal differenceBetweenTimes = new BigDecimal(ChronoUnit.MINUTES.between(plateRecord.entry, leaveOffsetDateTime));
+        BigDecimal periodInMinutes = new BigDecimal(calculatePeriodInMinutes(plateRecord.price_model.frequencyValue, plateRecord.price_model.frequencyType));
+        return plateRecord.price_model.value.multiply(differenceBetweenTimes.divide(periodInMinutes, 0, RoundingMode.DOWN));
+    }
+    /**
+     * @param plate String
+     * @return total to be paid
+     * @throws NonUniqueResultException if more than one vehicle parked at that moment has the same plate, what is not expected.
+     * @throws NoResultException if no vehicle parked at the moment with tha plate was found.
+     */
+    @Transactional
+    public BigDecimal checkout(String plate) throws NonUniqueResultException, NoResultException 
+    {
+        OperationEntity operationEntity = 
+            em.createNamedQuery("OperationEntities.getParkedByPlate", OperationEntity.class)
+            .setParameter("plate", plate)
+            .getSingleResult();
+        OffsetDateTime leaveMoment = OffsetDateTime.now();
+        BigDecimal total = getTotal(plate, leaveMoment);
+        operationEntity.leave = leaveMoment;
+        operationEntity.total = total;
+        return total;
+    }
+
+
     public List<ParkingRecord> getParkingHistory()
     {
-        return em.createQuery("SELECT new org.estaciona.rapido.dto.ParkingRecord(o.id, o.plate, o.entry, o.leave, o.total) FROM OperationEntity o", ParkingRecord.class)
+        return em.createQuery("SELECT new org.estaciona.rapido.dto.ParkingRecord(o.hasPaid, o.id, o.plate, o.entry, o.leave, o.total) FROM OperationEntity o", ParkingRecord.class)
                 .getResultList();
     }
 }

@@ -1,5 +1,6 @@
 package org.estaciona.rapido.resources;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.estaciona.rapido.dto.ParkingRecord;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -26,6 +28,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -62,6 +66,21 @@ public class ParkingResource {
         return Response.status(Response.Status.CREATED).build();
         
     }
+
+    @POST
+    @Path("total")
+    public BigDecimal getTotalPaymentValue(@RestQuery String plate)
+    {
+        try {
+            return service.checkout(plate);
+        } catch (NonUniqueResultException | NoResultException interalError) {
+            throw new InternalServerErrorException(interalError);
+        }
+    }
+
+    // @POST
+    // @Path("remove")
+    // public Response removeVehicle()
 
     @GET
     @Path("history")

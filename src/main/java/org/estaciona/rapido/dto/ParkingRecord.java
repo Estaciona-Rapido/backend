@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import jakarta.persistence.Column;
 
 public class ParkingRecord {
+    public boolean hasPaid;
     public Long id;
     public String plate;
     public OffsetDateTime entry;
@@ -13,8 +14,9 @@ public class ParkingRecord {
     public BigDecimal total;
 
 
-    public ParkingRecord(long id, String plate, OffsetDateTime entry, OffsetDateTime leave, BigDecimal total)
+    public ParkingRecord(boolean hasPaid, long id, String plate, OffsetDateTime entry, OffsetDateTime leave, BigDecimal total)
     {
+        this.hasPaid = hasPaid;
         this.id = id;
         this.plate = plate;
         this.entry = entry;

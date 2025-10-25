@@ -33,6 +33,7 @@ CREATE TABLE operation(
     operation_leave TIMESTAMP WITH TIME ZONE,
     plate VARCHAR(7) NOT NULL CHECK (plate ~ '[A-Z]{3}[0-9]{4}' OR plate ~ '[A-Z]{3}[0-9][A-Z][0-9]{2}'),
     total NUMERIC(38,2) CHECK (total > -1),
+    paid BOOLEAN NOT NULL DEFAULT FALSE,
     id_price_model BIGINT NOT NULL REFERENCES price_model (id_price_model)
 );
 
