@@ -21,6 +21,8 @@ import jakarta.persistence.Table;
     query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate AND operation.hasPaid is FALSE")
 @NamedQuery(name = "OperationEntities.getParkedByPlate",
     query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate AND operation.hasPaid is FALSE")
+@NamedQuery(name = "OperationEntities.getByPlate",
+    query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate")
 public class OperationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

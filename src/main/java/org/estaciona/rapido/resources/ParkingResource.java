@@ -1,13 +1,18 @@
 package org.estaciona.rapido.resources;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
+import org.estaciona.rapido.dto.EstacionaRapidoExceptionResponse;
 import org.estaciona.rapido.dto.ParkingRecord;
 import org.estaciona.rapido.dto.ParkingRegisterProposal;
 import org.estaciona.rapido.dto.Scenario;
 import org.estaciona.rapido.exceptions.ClosedException;
+import org.estaciona.rapido.exceptions.HasAlreadyPaid;
+import org.estaciona.rapido.exceptions.NoCheckout;
 import org.estaciona.rapido.exceptions.NoScenariosException;
+import org.estaciona.rapido.exceptions.TooOldCheckout;
 import org.estaciona.rapido.services.ParkingService;
 
 import org.jboss.resteasy.reactive.RestQuery;
@@ -68,7 +73,7 @@ public class ParkingResource {
     }
 
     @POST
-    @Path("total")
+    @Path("checkout")
     public BigDecimal getTotalPaymentValue(@RestQuery String plate)
     {
         try {
@@ -78,9 +83,27 @@ public class ParkingResource {
         }
     }
 
-    // @POST
-    // @Path("remove")
-    // public Response removeVehicle()
+    @POST
+    @Path("confirmCheckout")
+    public Response payTotalPaymentValue(@RestQuery String plate)
+    {
+        try {
+            service.confirmCheckout(plate);
+            return Response.status(Response.Status.OK).build();
+        } catch (NoCheckout | NoResultException exception1) {
+            throw new NotFoundException(exception1);
+        } catch (HasAlreadyPaid | TooOldCheckout exception2) {
+            throw new WebApplicationException(Response
+                .status(Response.Status.CONFLICT)
+                .entity(new EstacionaRapidoExceptionResponse(exception2.getMessage(), OffsetDateTime.now()))
+                .build());
+        } catch (NonUniqueResultException exception3) {
+            throw new WebApplicationException(Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new EstacionaRapidoExceptionResponse(exception3.getMessage(), OffsetDateTime.now()))
+                .build());
+        }
+    }
 
     @GET
     @Path("history")

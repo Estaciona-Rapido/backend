@@ -24,7 +24,10 @@ import org.estaciona.rapido.dto.PriceOption;
 import org.estaciona.rapido.dto.Scenario;
 import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.ClosedException;
+import org.estaciona.rapido.exceptions.HasAlreadyPaid;
+import org.estaciona.rapido.exceptions.NoCheckout;
 import org.estaciona.rapido.exceptions.NoScenariosException;
+import org.estaciona.rapido.exceptions.TooOldCheckout;
 import org.estaciona.rapido.persistence.BusinessHourEntity;
 import org.estaciona.rapido.persistence.FrequencyEnum;
 import org.estaciona.rapido.persistence.OperationEntity;
@@ -107,7 +110,7 @@ public class ParkingService {
         return ((long) value) * ((long) type.getValueInMinutes());
     }
 
-    public BigDecimal getTotal(String plate, OffsetDateTime leaveOffsetDateTime)
+    private BigDecimal getTotal(String plate, OffsetDateTime leaveOffsetDateTime)
     {
         OperationEntity plateRecord = em.createNamedQuery("OperationEntities.filterParkedByPlate", OperationEntity.class)
         .setParameter("plate", plate)
@@ -136,7 +139,25 @@ public class ParkingService {
         return total;
     }
 
+    @Transactional
+    public void confirmCheckout(String plate) throws NonUniqueResultException, NoResultException, TooOldCheckout, HasAlreadyPaid, NoCheckout
+    {
+        OperationEntity operationEntity = 
+            em.createNamedQuery("OperationEntities.getByPlate", OperationEntity.class)
+            .setParameter("plate", plate)
+            .getSingleResult();
+        if (operationEntity.leave == null || operationEntity.total == null) {
+            throw new NoCheckout();
+        } else if (operationEntity.hasPaid == true) {
+            throw new HasAlreadyPaid();
+        } else if (operationEntity.leave.isBefore(OffsetDateTime.now().minusMinutes(5))) {
+            throw new TooOldCheckout();
+        } else {
+            operationEntity.hasPaid = true;
+        }
+    }
 
+    @Transactional
     public List<ParkingRecord> getParkingHistory()
     {
         return em.createQuery("SELECT new org.estaciona.rapido.dto.ParkingRecord(o.hasPaid, o.id, o.plate, o.entry, o.leave, o.total) FROM OperationEntity o", ParkingRecord.class)
