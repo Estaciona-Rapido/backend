@@ -9,6 +9,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.estaciona.rapido.dto.ScenarioBrief;
+import org.estaciona.rapido.persistence.BusinessHourEntity;
+import org.estaciona.rapido.persistence.PriceModelEntity;
 import org.estaciona.rapido.persistence.ScenarioEntity;
 
 @ApplicationScoped
@@ -19,15 +21,34 @@ public class ScenarioService {
 
     @Transactional
     public void newScenario(String name) {
-        ScenarioEntity sc = new ScenarioEntity();
-        sc.name = name;
+        ScenarioEntity newScenarioEntity = new ScenarioEntity();
+        newScenarioEntity.name = name;
         // TODO: add exception for not having default.
         ScenarioEntity defaultScenarioEntity = em.getReference(ScenarioEntity.class, 1);
-        sc.capacity = defaultScenarioEntity.capacity;
-        sc.start = OffsetDateTime.now().plusDays(1);
-        sc.end = OffsetDateTime.now().plusDays(2);
-        // TODO: add the same price model and business hour from default.
-        em.persist(sc);
+        newScenarioEntity.capacity = defaultScenarioEntity.capacity;
+        newScenarioEntity.start = OffsetDateTime.now().plusDays(1);
+        newScenarioEntity.end = OffsetDateTime.now().plusDays(2);
+        em.persist(newScenarioEntity);
+        for (PriceModelEntity price : defaultScenarioEntity.prices) {
+            PriceModelEntity newPrice = new PriceModelEntity();
+            newPrice.name = price.name;
+            newPrice.isActivated = price.isActivated;
+            newPrice.value = price.value;
+            newPrice.frequencyValue = price.frequencyValue;
+            newPrice.frequencyType = price.frequencyType;
+            newPrice.scenario = newScenarioEntity;
+            em.persist(newPrice);
+        }
+        for (BusinessHourEntity businessHour : defaultScenarioEntity.businessHours) {
+            BusinessHourEntity newBusinessHour = new BusinessHourEntity();
+            newBusinessHour.isActivated = businessHour.isActivated;
+            newBusinessHour.startWeekDay = businessHour.startWeekDay;
+            newBusinessHour.endWeekDay = businessHour.endWeekDay;
+            newBusinessHour.startTime = businessHour.startTime;
+            newBusinessHour.endTime = businessHour.endTime;
+            newBusinessHour.scenario = newScenarioEntity;
+            em.persist(newBusinessHour);
+        }
         
     }
 
