@@ -160,7 +160,21 @@ public class ParkingService {
     @Transactional
     public List<ParkingRecord> getParkingHistory()
     {
-        return em.createQuery("SELECT new org.estaciona.rapido.dto.ParkingRecord(o.hasPaid, o.id, o.plate, o.entry, o.leave, o.total) FROM OperationEntity o", ParkingRecord.class)
+        List<OperationEntity> operations = em.createQuery("SELECT operation FROM OperationEntity operation", OperationEntity.class)
                 .getResultList();
+        List<ParkingRecord> result = new ArrayList<ParkingRecord>(operations.size());
+        for (int operationIndex = 0; operationIndex < operations.size(); operationIndex++) {
+            OperationEntity operation = operations.get(operationIndex);
+            ParkingRecord newParkingRecord = new ParkingRecord(operation.id, operation.plate, operation.entry);
+            if (operation.hasPaid) {
+                newParkingRecord.leave = operation.leave;
+                newParkingRecord.total = operation.total;
+            } else {
+                newParkingRecord.leave = null;
+                newParkingRecord.total = null;
+            }
+            result.add(newParkingRecord);
+        }
+        return result;
     }
 }
