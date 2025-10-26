@@ -51,4 +51,16 @@ public class ScenarioService {
         em.remove(toDeleteScenarioEntity);
         return true;
     }
+
+    @Transactional
+    public long getCapacity(int scenarioId)
+    {
+        return em.find(ScenarioEntity.class, scenarioId).capacity;
+    }
+
+    @Transactional
+    public long getDefaultScenarioCapacity()
+    {
+        return getCapacity(1);
+    }
 }

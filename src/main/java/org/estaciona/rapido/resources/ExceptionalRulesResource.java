@@ -2,7 +2,11 @@ package org.estaciona.rapido.resources;
 
 import java.util.List;
 
+import org.estaciona.rapido.dto.BusinessHour;
+import org.estaciona.rapido.dto.PriceModel;
 import org.estaciona.rapido.dto.ScenarioBrief;
+import org.estaciona.rapido.services.BusinessHourService;
+import org.estaciona.rapido.services.PriceModelService;
 import org.estaciona.rapido.services.ScenarioService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
@@ -21,24 +25,30 @@ import jakarta.ws.rs.core.Response;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
-@Path("/exception")
+@Path("/configuration/rules/exceptions")
 @ApplicationScoped
-public class ExceptionResource {
+public class ExceptionalRulesResource {
     @Inject
-    ScenarioService service;
+    ScenarioService scenarioService;
+
+    @Inject
+    BusinessHourService businessHourService;
+
+    @Inject
+    PriceModelService priceModelService;
 
     @POST
     @Transactional
     public void createExceptionalScenario(@RestQuery String name)
     {
-        service.newScenario(name);
+        scenarioService.newScenario(name);
     }
 
     @GET
     @Transactional
     public List<ScenarioBrief> listExceptionalScenarios()
     {
-        return service.listExceptionalScenarios();
+        return scenarioService.listExceptionalScenarios();
     }
 
     @DELETE
@@ -46,7 +56,7 @@ public class ExceptionResource {
     @Transactional
     public Response deleteExceptionalScenario(long id)
     {
-        if (service.deleteExceptionalScenario(id))
+        if (scenarioService.deleteExceptionalScenario(id))
         {
             return Response.status(204).build();
         }
@@ -55,4 +65,26 @@ public class ExceptionResource {
             throw new WebApplicationException("Such an Exceptional Scenario does not exist.");
         }
     }
+
+    @GET
+    @Path("{id}/business-hour")
+    public List<BusinessHour> getExceptionalScenarioBusinessHours(long id)
+    {
+        return businessHourService.getBusinessHours(id);
+    }
+
+    @GET
+    @Path("{id}/capacity")
+    public long getCapacity(int id)
+    {
+        return scenarioService.getCapacity(id);
+    }
+    
+    @GET
+    @Path("{id}/price-model")
+    public List<PriceModel> getExceptionalScenarioPriceModels(long id)
+    {
+        return priceModelService.getPriceModels(id);
+    }
+
 }

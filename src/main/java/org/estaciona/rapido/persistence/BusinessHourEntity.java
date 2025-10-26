@@ -16,6 +16,8 @@ import jakarta.persistence.Table;
 @Table(name="business_hour")
 @NamedQuery(name = "BusinessHourEntities.getAvaliable",
     query = "SELECT b FROM BusinessHourEntity b WHERE b.scenario.id = :id AND :weekDay BETWEEN b.startWeekDay AND b.endWeekDay AND :time BETWEEN b.startTime AND b.endTime AND b.isActivated is True")
+@NamedQuery(name = "BusinessHours.getById",
+    query = "SELECT new org.estaciona.rapido.dto.BusinessHour(entity.id, entity.isActivated, entity.startWeekDay, entity.endWeekDay, entity.startTime, entity.endTime) FROM BusinessHourEntity entity WHERE entity.scenario.id = :id")
 public class BusinessHourEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
