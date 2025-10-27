@@ -54,6 +54,13 @@ public class ParkingResource {
         }
     }
 
+    @GET
+    @Path("occupancy")
+    public long getOccupancy()
+    {
+        return service.getOccupancy();
+    }
+
     @POST
     @Path("register")
     @Transactional

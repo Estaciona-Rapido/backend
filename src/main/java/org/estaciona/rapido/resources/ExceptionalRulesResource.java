@@ -5,8 +5,10 @@ import java.util.List;
 import org.estaciona.rapido.dto.BusinessHour;
 import org.estaciona.rapido.dto.BusinessHourProposal;
 import org.estaciona.rapido.dto.PriceModel;
+import org.estaciona.rapido.dto.PriceModelProposal;
 import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.NoBusinessHoursException;
+import org.estaciona.rapido.exceptions.NoPriceModelException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.services.BusinessHourService;
 import org.estaciona.rapido.services.PriceModelService;
@@ -51,9 +53,20 @@ public class ExceptionalRulesResource {
 
     @GET
     @Transactional
-    public List<ScenarioBrief> listExceptionalScenarios()
+    public List<ScenarioBrief> getExceptionalScenarios()
     {
         return scenarioService.listExceptionalScenarios();
+    }
+
+    @PATCH
+    @Path("{id}")
+    public void renameExceptionalScenario(long id, @RestQuery String name)
+    {
+        try {
+            scenarioService.renameExceptionalScenario(id, name);
+        } catch (NoScenariosException noScenariosException) {
+            throw EstacionaRapidoExceptionResponse.create(Response.Status.NOT_FOUND, noScenariosException.getMessage());
+        }
     }
 
     @DELETE
@@ -122,9 +135,42 @@ public class ExceptionalRulesResource {
     
     @GET
     @Path("{id}/price-model")
-    public List<PriceModel> getExceptionalScenarioPriceModels(long id)
+    public List<PriceModel> getExceptionalScenarioPriceModels(@PathParam("id") long scenarioId)
     {
-        return priceModelService.getPriceModels(id);
+        return priceModelService.getPriceModels(scenarioId);
+    }
+
+    @POST
+    @Path("{id}/price-model")
+    public void createExceptionalScenarioPriceModel(PriceModelProposal priceModelProposal, @PathParam("id") long scenarioId)
+    {
+        try {
+            priceModelService.createPriceModel(priceModelProposal, scenarioId);
+        } catch (NoScenariosException noScenariosException) {
+            throw EstacionaRapidoExceptionResponse.create(Response.Status.NOT_FOUND, noScenariosException.getMessage());
+        }
+    }
+
+    @PATCH
+    @Path("{id}/price-model")
+    public void setExceptionalScenarioPriceModel(@RestQuery long id, PriceModelProposal priceModelProposal, @PathParam("id") long scenarioId)
+    {
+        try {
+            priceModelService.setPriceModel(id, priceModelProposal, scenarioId);
+        } catch (NoPriceModelException noPriceModelException) {
+            throw EstacionaRapidoExceptionResponse.create(Response.Status.NOT_FOUND, noPriceModelException.getMessage());
+        }
+    }
+
+    @DELETE
+    @Path("{id}/price-model")
+    public void deletePriceModel(@RestQuery long id, @PathParam("id") long scenarioId)
+    {
+        try {
+            priceModelService.deletePriceModel(id, scenarioId);
+        } catch (NoPriceModelException noPriceModelException) {
+            throw EstacionaRapidoExceptionResponse.create(Response.Status.NOT_FOUND, noPriceModelException.getMessage());
+        }
     }
 
 }

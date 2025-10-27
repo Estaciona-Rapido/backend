@@ -15,8 +15,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "operation")
-@NamedQuery(name = "OperationEntity.getOccupancy",
-    query = "SELECT COUNT(operation.id) FROM OperationEntity operation WHERE operation.leave is NULL AND operation.hasPaid is FALSE")
+@NamedQuery(name = "OperationEntities.getOccupancy",
+    query = "SELECT COUNT(operation.id) FROM OperationEntity operation WHERE operation.hasPaid is FALSE")
 @NamedQuery(name = "OperationEntities.filterParkedByPlate",
     query = "SELECT operation FROM OperationEntity operation WHERE operation.plate = :plate AND operation.hasPaid is FALSE")
 @NamedQuery(name = "OperationEntities.getParkedByPlate",

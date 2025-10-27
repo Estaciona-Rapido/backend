@@ -87,6 +87,12 @@ public class ParkingService {
     }
 
     @Transactional
+    public Long getOccupancy()
+    {
+        return em.createNamedQuery("OperationEntities.getOccupancy", Long.class).getSingleResult();
+    }
+
+    @Transactional
     public void register(ParkingRegisterProposal proposal) throws IndexOutOfBoundsException, NoScenariosException, ClosedException
     {
         ScenarioEntity currentScenario = getCurrentScenarioEntity();
@@ -132,9 +138,14 @@ public class ParkingService {
             em.createNamedQuery("OperationEntities.getParkedByPlate", OperationEntity.class)
             .setParameter("plate", plate)
             .getSingleResult();
-        OffsetDateTime leaveMoment = OffsetDateTime.now();
-        BigDecimal total = getTotal(plate, leaveMoment);
-        operationEntity.leave = leaveMoment;
+        int tolerance = operationEntity.price_model.scenario.tolerance;
+        BigDecimal total;
+        operationEntity.leave = OffsetDateTime.now();
+        if (ChronoUnit.MINUTES.between(operationEntity.entry, operationEntity.leave) < ((long) tolerance)) {
+            total = new BigDecimal(0);
+        } else {
+            total = getTotal(plate, operationEntity.leave);
+        }
         operationEntity.total = total;
         return total;
     }

@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.estaciona.rapido.dto.ScenarioBrief;
+import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.persistence.BusinessHourEntity;
 import org.estaciona.rapido.persistence.PriceModelEntity;
 import org.estaciona.rapido.persistence.ScenarioEntity;
@@ -57,6 +58,19 @@ public class ScenarioService {
         List<ScenarioBrief> ls = em.createQuery("SELECT new org.estaciona.rapido.dto.ScenarioBrief(s.id, s.name) FROM ScenarioEntity s", ScenarioBrief.class)
                 .getResultList();
         return ls.subList(1, ls.size());
+    }
+
+    @Transactional
+    public void renameExceptionalScenario(long id, String newName) throws NoScenariosException
+    {
+        if (id < 2 || newName.length() > 50) {
+            throw new IllegalArgumentException();
+        }
+        ScenarioEntity scenarioEntityToBeRenamed = em.find(ScenarioEntity.class, id);
+        if (scenarioEntityToBeRenamed == null) {
+            throw new NoScenariosException("No scenarios were found to be renamed.");
+        }
+        scenarioEntityToBeRenamed.name = newName;
     }
 
     @Transactional
