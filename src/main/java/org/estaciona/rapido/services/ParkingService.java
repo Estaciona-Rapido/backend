@@ -25,7 +25,7 @@ import org.estaciona.rapido.dto.Scenario;
 import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.HasAlreadyPaid;
-import org.estaciona.rapido.exceptions.NoCheckout;
+import org.estaciona.rapido.exceptions.NoCheckoutException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.exceptions.TooOldCheckout;
 import org.estaciona.rapido.persistence.BusinessHourEntity;
@@ -48,7 +48,7 @@ public class ParkingService {
         } else if (currentScenarios.size() == 1) {
             return currentScenarios.get(0);
         } else {
-            throw new NoScenariosException();
+            throw new NoScenariosException("There is no scenarios in the current date and time. Please, check the state and position of default scenario in the database.");
         }
     }
 
@@ -140,14 +140,14 @@ public class ParkingService {
     }
 
     @Transactional
-    public void confirmCheckout(String plate) throws NonUniqueResultException, NoResultException, TooOldCheckout, HasAlreadyPaid, NoCheckout
+    public void confirmCheckout(String plate) throws NonUniqueResultException, NoResultException, TooOldCheckout, HasAlreadyPaid, NoCheckoutException
     {
         OperationEntity operationEntity = 
             em.createNamedQuery("OperationEntities.getByPlate", OperationEntity.class)
             .setParameter("plate", plate)
             .getSingleResult();
         if (operationEntity.leave == null || operationEntity.total == null) {
-            throw new NoCheckout();
+            throw new NoCheckoutException();
         } else if (operationEntity.hasPaid == true) {
             throw new HasAlreadyPaid();
         } else if (operationEntity.leave.isBefore(OffsetDateTime.now().minusMinutes(5))) {

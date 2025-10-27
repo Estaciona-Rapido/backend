@@ -26,7 +26,7 @@ import org.estaciona.rapido.dto.Scenario;
 import org.estaciona.rapido.dto.ScenarioBrief;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.HasAlreadyPaid;
-import org.estaciona.rapido.exceptions.NoCheckout;
+import org.estaciona.rapido.exceptions.NoCheckoutException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.exceptions.TooOldCheckout;
 import org.estaciona.rapido.persistence.BusinessHourEntity;

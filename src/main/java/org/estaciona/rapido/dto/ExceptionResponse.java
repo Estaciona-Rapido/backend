@@ -12,4 +12,4 @@ import java.time.OffsetDateTime;
 //     }
 // }
 
-public record EstacionaRapidoExceptionResponse(String errorMessage, OffsetDateTime at) {}
+public record ExceptionResponse(String errorMessage, OffsetDateTime at) {}

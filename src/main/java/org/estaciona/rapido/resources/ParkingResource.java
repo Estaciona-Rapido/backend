@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.estaciona.rapido.dto.EstacionaRapidoExceptionResponse;
+import org.estaciona.rapido.dto.ExceptionResponse;
 import org.estaciona.rapido.dto.ParkingRecord;
 import org.estaciona.rapido.dto.ParkingRegisterProposal;
 import org.estaciona.rapido.dto.Scenario;
 import org.estaciona.rapido.exceptions.ClosedException;
 import org.estaciona.rapido.exceptions.HasAlreadyPaid;
-import org.estaciona.rapido.exceptions.NoCheckout;
+import org.estaciona.rapido.exceptions.NoCheckoutException;
 import org.estaciona.rapido.exceptions.NoScenariosException;
 import org.estaciona.rapido.exceptions.TooOldCheckout;
 import org.estaciona.rapido.services.ParkingService;
@@ -90,17 +90,17 @@ public class ParkingResource {
         try {
             service.confirmCheckout(plate);
             return Response.status(Response.Status.OK).build();
-        } catch (NoCheckout | NoResultException exception1) {
+        } catch (NoCheckoutException | NoResultException exception1) {
             throw new NotFoundException(exception1);
         } catch (HasAlreadyPaid | TooOldCheckout exception2) {
             throw new WebApplicationException(Response
                 .status(Response.Status.CONFLICT)
-                .entity(new EstacionaRapidoExceptionResponse(exception2.getMessage(), OffsetDateTime.now()))
+                .entity(new ExceptionResponse(exception2.getMessage(), OffsetDateTime.now()))
                 .build());
         } catch (NonUniqueResultException exception3) {
             throw new WebApplicationException(Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new EstacionaRapidoExceptionResponse(exception3.getMessage(), OffsetDateTime.now()))
+                .entity(new ExceptionResponse(exception3.getMessage(), OffsetDateTime.now()))
                 .build());
         }
     }
