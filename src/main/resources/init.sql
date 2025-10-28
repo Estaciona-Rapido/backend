@@ -36,20 +36,3 @@ CREATE TABLE operation(
     paid BOOLEAN NOT NULL DEFAULT FALSE,
     id_price_model BIGINT NOT NULL REFERENCES price_model (id_price_model)
 );
-
-CREATE TABLE estaciona_role(
-    id_role INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    role_name VARCHAR(50) NOT NULL UNIQUE
-);
-
-CREATE TABLE estaciona_user(
-    id_user INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(50) NOT NULL,
-    password_hash TEXT NOT NULL
-);
-
-CREATE TABLE estaciona_user_role(
-    id_user_role INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    id_user INT NOT NULL REFERENCES estaciona_user (id_user),
-    id_role INT NOT NULL REFERENCES estaciona_role (id_role)
-);

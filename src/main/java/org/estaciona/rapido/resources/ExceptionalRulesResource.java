@@ -2,6 +2,7 @@ package org.estaciona.rapido.resources;
 
 import java.util.List;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.estaciona.rapido.dto.BusinessHour;
 import org.estaciona.rapido.dto.BusinessHourProposal;
 import org.estaciona.rapido.dto.PriceModel;
@@ -16,6 +17,7 @@ import org.estaciona.rapido.services.ScenarioService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -36,6 +38,9 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class ExceptionalRulesResource {
     @Inject
+    JsonWebToken jwt;
+
+    @Inject
     ScenarioService scenarioService;
 
     @Inject
@@ -52,6 +57,7 @@ public class ExceptionalRulesResource {
     }
 
     @GET
+    @RolesAllowed({"admin"})
     @Transactional
     public List<ScenarioBrief> getExceptionalScenarios()
     {

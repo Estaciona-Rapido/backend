@@ -4,6 +4,20 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
 
+## Before running
+
+Create a public key pair. Stores its public key on `src/main/resources/publicKey.pem`. You can create it with the following command:
+```bash
+openssl genrsa -out rsaPrivateKey.pem 2048
+openssl rsa -pubout -in rsaPrivateKey.pem -out publicKey.pem
+
+openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out privateKey.pem
+```
+
+If you intend to run the this service with the rest of the backend, save the private key to store it on auth service.
+
+If you intend to test this repository, place the private key at `src/main/resources/privateKey.pem`.
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
