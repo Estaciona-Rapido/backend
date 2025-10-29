@@ -21,9 +21,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Build with Maven and run Unit Tests
-        run: ./mvnw test
       - name: Run postgres service
         run: docker compose up -d estaciona-postgres
+      - name: Build with Maven and run Unit Tests
+        run: ./mvnw test
       - name: Run Integration Tests
         run: ./mvnw verify -DskipITs=false
